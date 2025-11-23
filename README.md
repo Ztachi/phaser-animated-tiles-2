@@ -1,63 +1,103 @@
 # Phaser 3 Animated Tiles Plugin
 
-A simple plugin with a simple purpose: to add support for animated tiles to Phaser 3 (3.8.0+) as exported from Tiled.
+A plugin that adds support for animated tiles to Phaser 3 (v3.90+), as exported from Tiled.
 
-The bundled example is available live here: http://metroid.niklasberg.se/phaser-animated-tiles/
+This is a modernized fork of the original [phaser-animated-tiles](https://github.com/nkholski/phaser-animated-tiles) plugin, maintained by [Ztachi](https://github.com/Ztachi). It has been rewritten in TypeScript and updated to support the latest Phaser versions (v3.90+) and Vite.
 
-The plugin is also used in this platformer example: https://github.com/nkholski/phaser3-es6-webpack
-
-The plugin is based on Photonstorms plugin template: https://github.com/photonstorm/phaser3-plugin-template
-
-Latest build can be found in the dist folder or NPM: https://www.npmjs.com/package/phaser-animated-tiles
-
-Run `npm install` and then `npm run build` to build the plugin.
+**Project Home**: [https://github.com/Ztachi/phaser-animated-tiles-2](https://github.com/Ztachi/phaser-animated-tiles-2)
 
 ## Features
-This plugin supports unlimited maps, layers and tilesets simultaneously. There are methods to control animations globally, within specified tilemaps or layers. Those methods can control such things as playback-rate both for all tiles and for specified tiles. ATM it's up to you to keep track on indicies for maps you add and their layers. For most cases that shouldn't be a problem. If you just want to support animated tiles exactly as specified in Tiled you need three lines; one to preload the plugin, one to register it in your create method and one to initilize it for your map.
 
-### Future
-I have a few stuff I would like to add, of which some might be [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it):
-1. PutTile as the native API but will push the tile to the update list for that tile gid. If you put a tile over an animated tile, that tile should instead be removed from the list. The latter is just needed if the new gid is a part of the current anim, but still nice to have.
-2. Define animations programmatically.
-3. And if 2 is done: Allow animated rotation (probably 45 degree steps only), flipping and alpha. Tint? Stuff that Phaser supports.
-4. Method to reset everything to their first frame.
+-   ✅ Support for standard Tiled maps (fixed size)
+-   ✅ Support for Infinite Maps (chunks)
+-   ✅ Support for both Object and Array formats of `tileData` (Tiled export compatibility)
+-   ✅ Compatible with Phaser 3.50+ (fixes deprecated `StaticTilemapLayer` usage)
+-   ✅ Multi-tileset support
+-   ✅ Animation rate control (global, per-map, or per-tile)
+-   ✅ TypeScript support
 
-## Install repository
-Clone the repository from git and run `npm i` and you're set to go.
+## Installation
 
-## Demo / Dev
-The plugin is bundled with a demo which is also used for testing during development.
-`npm run demo` or `npm run dev`
+### NPM
 
-## Build plugin
-Build the plugin including minified version:
-`npm run build`
-
-## How to use the plugin
-
-### 1. Load the plugin
-
-Please check out these Phaser 3 demos http://labs.phaser.io/index.html?dir=plugins/&q= for various methods to load the plugin as a **scene plugin**.
-
-### 2. Use the plugin API
-
-To initilize the plugin you just need to pass the tilemap you want to animate to the plugin. The plugin requires a dynamic layers to work.
-
+```bash
+npm install phaser-animated-tiles-2
 ```
-function create ()
-{
-    this.sys.animatedTiles.init(map);
+
+## Usage
+
+### 1. Import and Load the Plugin
+
+In your scene's `preload` method, load the plugin.
+
+```typescript
+import AnimatedTiles from 'phaser-animated-tiles';
+
+export default class WorldScene extends Phaser.Scene {
+	preload() {
+		this.load.scenePlugin('animatedTiles', AnimatedTiles, 'animatedTiles', 'animatedTiles');
+	}
+
+	create() {
+		// Create your map
+		const map = this.make.tilemap({ key: 'map' });
+		const tileset = map.addTilesetImage('tiles', 'tiles');
+		const layer = map.createLayer('Ground', tileset, 0, 0);
+
+		// Initialize the plugin
+		this.sys.animatedTiles.init(map);
+	}
 }
 ```
 
-This is actually all you need to do but you may control the plugin calling methods with "this.sys.animatedTiles.methodName()". (The inconsistency between passing a tilemap and a mapindex will be solved by excepting both in all concerned methods. Methods to find tilemaps, layers and tiles will be added.)
+### 2. API Methods
 
-Current list of methods:
+The plugin is exposed via `this.sys.animatedTiles`.
 
-| Method        | Args          | Usage  |
-| ------------- |---------------| -----|
-| resetRates     | mapIndex?: int | Sets playback rate to 1 globally and for each individual tile, pass mapIndex to limit the method to that map |
-| setRate       | rate: int, gid?: int, map?: Phaser.Tilemap      |  Sets playback multiplier to 'rate'. A rate of 2 will play the animation twice as fast as configured in Tiled, and 0.5 half as fast. If a gid is specified the rate is exclusively set for that tile. If the global rate is set to 0.5 and the rate of a tile is set to 2 it will play as configured in Tiled (0.5*2 = 1). Pass tilemap to limit the method to that map.|
-| resume         | layerIndex?:int, mapIndex?:int     | Resume tile animations globally if no layerIndex is set (may be overridden by layers), otherwise for that layer only. Pass mapIndex to limit the method to that map. |
-| pause          | layerIndex?:int, mapIndex?:int     | Resume tile animations globally if no layerIndex is set and overrides layer settingsm, otherwise for that layer only. Pass mapIndex to limit the method to that map.|
-| updateAnimatedTiles | TODO | Tell the plugin when you have added new animated tiles to layers after initialization. Needed to detect new animations. |
+| Method       | Arguments                                           | Description                                                                                                                                       |
+| ------------ | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `init`       | `map: Phaser.Tilemaps.Tilemap`                      | Initialize the plugin for a specific map. Scans for animated tiles and starts animations.                                                         |
+| `setRate`    | `rate: number`, `gid?: number`, `mapIndex?: number` | Set the playback rate. `rate` is a multiplier (1 = normal, 2 = double speed). Can be applied globally, to a specific tile GID, or a specific map. |
+| `resetRates` | `mapIndex?: number`                                 | Reset all rates to 1.                                                                                                                             |
+| `resume`     | `layerIndex?: number`, `mapIndex?: number`          | Resume animations. Can be specific to a layer or map.                                                                                             |
+| `pause`      | `layerIndex?: number`, `mapIndex?: number`          | Pause animations. Can be specific to a layer or map.                                                                                              |
+
+## Recent Updates & Fixes
+
+This version includes several critical fixes to support modern development workflows:
+
+### 1. Tiled Data Format Support
+
+Fixed compatibility with newer Tiled versions which export `tileData` as an array `[{id: 6, animation: [...]}]` instead of an object. The plugin now auto-detects and handles both formats.
+
+### 2. Phaser 3.50+ Compatibility
+
+Replaced deprecated `StaticTilemapLayer` checks with modern `TilemapLayer` type checking. This ensures animations work correctly on all layer types that support them.
+
+### 3. Infinite Map Support
+
+Added proper support for Infinite Maps. The plugin now correctly scans chunks in infinite layers to find and animate tiles.
+
+### 4. Robustness
+
+-   Added null checks for layer data to prevent crashes with empty or sparse layers.
+-   Improved logging for easier debugging of missing animations.
+
+## Troubleshooting
+
+**Animations not showing?**
+
+1. Check the console for `[AnimatedTiles]` logs.
+2. Ensure your layer is NOT a static layer if you want animations (though the plugin tries to handle this, static layers generally don't support texture frame updates).
+3. If using Infinite Maps, ensure the chunks containing the animated tiles are loaded.
+
+## Build
+
+To build the project locally:
+
+```bash
+npm install
+npm run build
+```
+
+The output will be in the `dist` folder.
