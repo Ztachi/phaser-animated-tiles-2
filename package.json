@@ -1,39 +1,42 @@
 {
-  "name": "phaser-animated-tiles",
-  "version": "2.0.2",
+  "name": "phaser-animated-tiles-2",
+  "version": "2.0.3",
   "description": "Phaser 3 Animated Tiles Plugin",
-  "main": "src/plugin/main.js",
+  "main": "./dist/phaser-animated-tiles-2.umd.js",
+  "module": "./dist/phaser-animated-tiles-2.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/phaser-animated-tiles-2.es.js",
+      "require": "./dist/phaser-animated-tiles-2.umd.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "webpack --config webpack.build.config.js",
-    "demo": "webpack --config webpack.demo.config.js",
-    "dev": "webpack --config webpack.demo.config.js"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nkholski/phaser-animated-tiles.git"
+    "url": "git+https://github.com/Ztachi/phaser-animated-tiles-2.git"
   },
-  "author": "Niklas Berg",
+  "author": "Niklas Berg (Original), Ztachi (Maintainer)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nkholski/phaser-animated-tiles/issues"
+    "url": "https://github.com/Ztachi/phaser-animated-tiles-2/issues"
   },
-  "homepage": "https://github.com/nkholski/phaser-animated-tiles#readme",
+  "homepage": "https://github.com/Ztachi/phaser-animated-tiles-2#readme",
   "devDependencies": {
-    "babel-core": "^6.25.0",
-    "babel-eslint": "^7.2.3",
-    "babel-loader": "^7.1.1",
-    "babel-polyfill": "^6.23.0",
-    "babel-preset-es2015": "^6.24.1",
-    "browser-sync": "^3.0.2",
-    "browser-sync-webpack-plugin": "^2.2.2",
-    "copy-webpack-plugin": "^4.5.1",
-    "dat.gui": "^0.7.0",
-    "html-webpack-plugin": "^5.5.0",
-    "phaser": "3.8.0",
-    "webpack": "^4.8.3",
-    "webpack-cli": "^2.1.3"
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.0.0",
+    "phaser": "^3.80.0"
   },
   "peerDependencies": {
-    "phaser": "^3.x"
+    "phaser": "^3.0.0"
   }
 }
