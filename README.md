@@ -31,7 +31,7 @@ npm install phaser-animated-tiles-2
 In your scene's `preload` method, load the plugin.
 
 ```typescript
-import AnimatedTiles from 'phaser-animated-tiles';
+import AnimatedTiles from 'phaser-animated-tiles-2';
 
 export default class WorldScene extends Phaser.Scene {
 	preload() {
